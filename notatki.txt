@@ -1,7 +1,7 @@
 zainstalowany docker i komendy dla bazy danych:
  * docker pull postgres
+ * mkdir postgres_data
 	JEŚLI NIE MA DOCKER FILE:
-	 * mkdir postgres_data
 	 * docker run --name postgres_database --restart=unless-stopped \
 		-e POSTGRES_DB=mydb \
 		-e POSTGRES_USER=myuser \
