@@ -1,3 +1,3 @@
 mga_venv/
 postgres_data/
-.idea/
+*.idea/
