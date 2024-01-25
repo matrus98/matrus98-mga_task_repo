@@ -77,12 +77,12 @@ WSGI_APPLICATION = 'mga_task.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mydb',
-        'USER': 'myuser',
-        'HOST': 'db' if 'is_docker_running_env_variable' in envs else 'localhost',
+        'NAME': envs['POSTGRES_DB'] if 'is_docker_running_env_variable' in envs else 'mydb',
+        'USER': envs['POSTGRES_USER'] if 'is_docker_running_env_variable' in envs else 'myuser',
+        'HOST': envs['DATABASE_CONTAINER_NAME'] if 'is_docker_running_env_variable' in envs else 'localhost',
         #'HOST': 'db',# set db (from docker file when starting), localhost during development
-        'PORT': 5432,
-        'PASSWORD': 'mysecretpassword',
+        'PORT': envs['POSTGRES_EXTERNAL_PORT'] if 'is_docker_running_env_variable' in envs else 5432,
+        'PASSWORD': envs['POSTGRES_PASSWORD'] if 'is_docker_running_env_variable' in envs else 'mysecretpassword',
     }
 }
 

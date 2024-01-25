@@ -21,4 +21,4 @@ COPY .${app_dir} ${app_root}/${app_dir}
 RUN mkdir -p /tmp/gunicorn
 RUN adduser -D guni_container_king
 RUN chown guni_container_king.guni_container_king /tmp/gunicorn/ -R
-USER guni_container_king
+#USER guni_container_king
