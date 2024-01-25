@@ -22,4 +22,4 @@ services:
       - "${MY_WEB_APP_EXTERNAL_PORT}:${MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER}" # External:Container
     # sleep command occurs here due to start up of database
     # if server runs before its configuration, the container with app run fails
-    command: sh -c "sleep 2 && python manage.py runserver 0.0.0.0:${MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER}"
+    command: gunicorn -c gunicorn.conf -w 4 mga_task.wsgi
