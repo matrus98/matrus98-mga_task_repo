@@ -15,7 +15,6 @@ RUN pip install -r /requirements.txt
 RUN mkdir ${app_root}
 RUN mkdir ${app_root}/${app_dir}
 WORKDIR ${app_root}
-COPY ./manage.py ${app_root}
 COPY ./gunicorn.conf ${app_root}
 COPY .${app_dir} ${app_root}/${app_dir}
 
