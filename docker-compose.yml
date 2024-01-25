@@ -12,3 +12,14 @@ services:
       - '5432:5432'
     volumes:
       - ./postgres_data:/var/lib/postgresql/data/
+  my_web_app:
+    depends_on:
+      - db
+    build:
+      context: ./
+    restart: always
+    ports:
+      - "80:80"
+    # sleep command occurs here due to start up of database
+    # if server runs before its configuration, the container with app run fails
+    command: sh -c "sleep 2 && python manage.py runserver 0.0.0.0:80"

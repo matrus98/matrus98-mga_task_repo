@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from os import environ as envs
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-pm0-p9csc39^wu^#coruml2ripe!=19@1%g8d$dq2dj3ksw!_l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', ]
+ALLOWED_HOSTS = ['*', ]
 
 
 # Application definition
@@ -78,7 +79,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mydb',
         'USER': 'myuser',
-        'HOST': 'localhost',
+        'HOST': 'db' if 'is_docker_running_env_variable' in envs else 'localhost',
+        #'HOST': 'db',# set db (from docker file when starting), localhost during development
         'PORT': 5432,
         'PASSWORD': 'mysecretpassword',
     }
