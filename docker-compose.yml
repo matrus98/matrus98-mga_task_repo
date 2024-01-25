@@ -5,13 +5,13 @@ services:
     image: postgres
     container_name: postgres_database
     environment:
-      - POSTGRES_DB=mydb
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - '5432:5432'
+      - '${POSTGRES_EXTERNAL_PORT}:${POSTGRES_INTERNAL_PORT_IN_CONTAINER}'
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data/
+      - ${POSTGRES_DATA_VOLUME}:/var/lib/postgresql/data/
   my_web_app:
     depends_on:
       - db
@@ -19,7 +19,7 @@ services:
       context: ./
     restart: always
     ports:
-      - "80:80"
+      - "${MY_WEB_APP_EXTERNAL_PORT}:${MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER}" # External:Container
     # sleep command occurs here due to start up of database
     # if server runs before its configuration, the container with app run fails
-    command: sh -c "sleep 2 && python manage.py runserver 0.0.0.0:80"
+    command: sh -c "sleep 2 && python manage.py runserver 0.0.0.0:${MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER}"
