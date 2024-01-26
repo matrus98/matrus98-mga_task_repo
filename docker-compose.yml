@@ -27,6 +27,9 @@ services:
       - MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER=${MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER}
     ports:
       - "${MY_WEB_APP_EXTERNAL_PORT}:${MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER}" # External:Container
-    # sleep command occurs here due to start up of database
-    # if server runs before its configuration, the container with app run fails
-    command: gunicorn -c gunicorn.conf -w ${GUNICORN_WORKERS} mga_task.wsgi
+    command: 
+      - sh
+      - -c
+      - |
+        sed -i s/PORT_NUMBER/$MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER/g gunicorn.conf
+        gunicorn -c gunicorn.conf -w ${GUNICORN_WORKERS} mga_task.wsgi
