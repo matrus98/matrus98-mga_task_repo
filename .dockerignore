@@ -1,1 +1,12 @@
-*.idea
+**.git
+**.idea
+mga_venv
+postgres_data
+*.dockerignore
+*.env
+*.gitignore
+*.yml
+**Dockerfile
+manage.py
+README.md
+notatki.txt
