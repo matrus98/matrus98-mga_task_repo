@@ -14,6 +14,7 @@ TaskStatusChoices = {
 
 
 class Task(models.Model):
+    id = models.AutoField(primary_key=True)
     author = models.CharField(max_length=100, default='Administrator')
     name = models.CharField(max_length=100)
     description = models.TextField()
