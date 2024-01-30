@@ -1,0 +1,20 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <table class="task_table">
+        <tr>
+            <th>Task title</th>
+            <th>Task author</th>
+            <th>Assigned user</th>
+            <th>Details</th>
+        </tr>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.name }}</td>
+                <td>{{ task.author }}</td>
+                <td>{{ task.assigned_user }}</td>
+                <td><button><a href="#">Task page</a></button></td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
