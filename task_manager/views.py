@@ -17,7 +17,7 @@ def task_create_new(request):
             task.author = request.user.username if request.user.username is not '' else 'Anonymous'
             # task.task_history.
             task.save()
-            return redirect('/')
+            return redirect('task_list')
     else:
         task_creation_form = TaskForm()
 
@@ -43,3 +43,9 @@ def task_edit(request, pk):
         task_edit_form = TaskForm(instance=task)
 
     return render(request, 'task_edit.html', {'form': task_edit_form})
+
+
+def task_delete(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    task.delete()
+    return redirect('task_list')
