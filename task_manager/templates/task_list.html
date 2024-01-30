@@ -1,20 +1,22 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <a href="{% url 'create_new_task' %}" class="top-menu"><span class="glyphicon glyphicon-plus">Add new task</span></a>
+    <a href="{% url 'task_create_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus">Add new task</span></a>
     <table class="task_table">
         <tr>
             <th>Task title</th>
             <th>Task author</th>
             <th>Assigned user</th>
             <th>Details</th>
+            <th>Modifications</th>
         </tr>
         {% for task in tasks %}
             <tr>
                 <td>{{ task.name }}</td>
                 <td>{{ task.author }}</td>
                 <td>{{ task.assigned_user }}</td>
-                <td><button><a href="#">Task page</a></button></td>
+                <td><button><a href="{% url 'task_details' pk=task.pk %}">Task page</a></button></td>
+                <td><button><a href="{% url 'task_edit' pk=task.pk %}">Edit task</a></button></td>
             </tr>
         {% endfor %}
     </table>

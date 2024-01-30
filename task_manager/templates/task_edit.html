@@ -1,6 +1,7 @@
 {% extends 'index.html' %}
 
 {% block content %}
+    <a href="{% url 'task_list' %}"><span>Go to main page</span></a>
     <h2>New task</h2>
     <form method="post" class="post-form">
         {% csrf_token %}
