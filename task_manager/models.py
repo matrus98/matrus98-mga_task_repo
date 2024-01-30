@@ -14,7 +14,7 @@ TaskStatusChoices = {
 
 
 class Task(models.Model):
-    author = 'Administrator'
+    author = models.CharField(max_length=100, default='Administrator')
     name = models.CharField(max_length=100)
     description = models.TextField()
     status = models.CharField(choices=TaskStatusChoices, default='CREATED')
@@ -23,8 +23,9 @@ class Task(models.Model):
     # for username in [user.username for user in User.objects.all()]:
     #     user_choice[username] = username
     # assigned_user = models.CharField(choices=user_choice, blank=True)
-    assigned_user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    assigned_user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     task_history = HistoricalRecords()
+    # task_detailed_history = []
 
     def __str__(self):
         return self.name
