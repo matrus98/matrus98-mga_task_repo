@@ -6,6 +6,7 @@
         <tr>
             <th>Task name</th>
             <th>Editor</th>
+            <th>Assigned user</th>
             <th>Updated fields</th>
             <th>Old values</th>
             <th>New values</th>
@@ -13,20 +14,21 @@
         </tr>
         {% for event in events %}
             <tr>
-                <td>{{ event.task.name }}</td>
+                <td>{{ event.task_name }}</td>
                 <td>{{ event.user_who_edited }}</td>
+                <td>{{ event.assigned_user }}</td>
                 <td>
-                    {% for field in event.field_to_update %}
+                    {% for field in event.fields_to_update %}
                         {{ field | linebreaks }}
                     {% endfor %}
                 </td>
                 <td>
-                    {% for old in event.old_value %}
+                    {% for old in event.old_values %}
                         {{ old | linebreaks }}
                     {% endfor %}
                 </td>
                 <td>
-                    {% for new in event.new_value %}
+                    {% for new in event.new_values %}
                         {{ new | linebreaks }}
                     {% endfor %}
                 </td>

@@ -27,19 +27,21 @@ class Task(models.Model):
 
 
 class HistoricalTaskEvent(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, blank=True, null=True)
+    task_id = models.CharField(max_length=100)
+    task_name = models.CharField(max_length=100)
     user_who_edited = models.CharField(max_length=100)
-    field_to_update = ArrayField(models.CharField(max_length=100), blank=True, null=True)
-    old_value = ArrayField(models.TextField(blank=True), blank=True, null=True)
-    new_value = ArrayField(models.TextField(blank=True), blank=True, null=True)
+    assigned_user = models.CharField(max_length=100)
+    fields_to_update = ArrayField(models.CharField(max_length=100), blank=True, null=True)
+    old_values = ArrayField(models.TextField(blank=True), blank=True, null=True)
+    new_values = ArrayField(models.TextField(blank=True), blank=True, null=True)
     occurrence_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         msg = ' '.join(
             ['value of field %s has been changed from %s to %s by user %s'
              .format(field, old, new) for field, old, new in
-             zip(self.field_to_update, self.old_value, self.new_value)]
+             zip(self.fields_to_update, self.old_values, self.new_values)]
         )
 
         return ("Task %s has been modified at %s in the following fields:\n%s"
-                .format(self.task.name, self.occurrence_date, msg))
+                .format(self.task_name, self.occurrence_date, msg))

@@ -5,7 +5,8 @@ from .models import Task, HistoricalTaskEvent
 from .froms import TaskForm
 
 
-forbidden_list = ['_state', '_django_version', 'id', 'assigned_user_id']
+forbidden_list = ['_state', '_django_version', 'id']
+map_value = 'assigned_user_id'
 
 
 def task_list(request):
@@ -23,18 +24,27 @@ def task_create_new(request):
             task.author = current_user
             task.save()
 
-            event = HistoricalTaskEvent.objects.create(user_who_edited=current_user)
-            event.task = task
+            event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
+                                                       user_who_edited=current_user)
+            assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
+            event.assigned_user = assigned_user
 
             fields = set([atr for atr, value in task.__dict__.items() if atr not in forbidden_list])
-            field_to_update, old_value, new_value = [], [], []
+            fields_to_update, old_values, new_values = [], [], []
+            if map_value in fields:
+                fields.remove(map_value)
+                fields_to_update.append('assigned user')
+                old_values.append('---')
+                new_values.append(assigned_user)
+
             for atr in fields:
-                field_to_update.append(atr)
-                old_value.append('---')
-                new_value.append(task.__dict__[atr])
-            event.field_to_update = field_to_update
-            event.old_value = old_value
-            event.new_value = new_value
+                fields_to_update.append(atr)
+                old_values.append('---')
+                new_values.append(task.__dict__[atr])
+            event.fields_to_update = fields_to_update
+            event.old_values = old_values
+            event.new_values = new_values
+
             event.save()
 
             return redirect('task_list')
@@ -61,22 +71,29 @@ def task_edit(request, pk):
             task = task_edit_form.save(commit=False)
             task.save()
 
-            event = HistoricalTaskEvent.objects.create(user_who_edited=current_user)
+            event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
+                                                       user_who_edited=current_user)
+            assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
+            event.assigned_user = assigned_user
 
             fields_where_change_occurred = set([atr for atr, value in
                                                 task_old.__dict__.items() ^ task.__dict__.items()
                                                 if atr not in forbidden_list])
+            fields_to_update, old_values, new_values = [], [], []
+            if map_value in fields_where_change_occurred:
+                fields_where_change_occurred.remove(map_value)
+                fields_to_update.append('assigned user')
+                old_values.append(task_old.assigned_user.username if task_old.assigned_user is not None else '---')
+                new_values.append(assigned_user)
 
-            field_to_update, old_value, new_value = [], [], []
             for atr in fields_where_change_occurred:
-                field_to_update.append(atr)
-                old_value.append(task_old.__dict__[atr])
-                new_value.append(task.__dict__[atr])
-            event.field_to_update = field_to_update
-            event.old_value = old_value
-            event.new_value = new_value
+                fields_to_update.append(atr)
+                old_values.append(task_old.__dict__[atr])
+                new_values.append(task.__dict__[atr])
+            event.fields_to_update = fields_to_update
+            event.old_values = old_values
+            event.new_values = new_values
 
-            event.task = task
             event.save()
 
             return redirect('task_details', pk=task.pk)
