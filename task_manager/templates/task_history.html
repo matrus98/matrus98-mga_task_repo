@@ -1,0 +1,37 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <a href="{% url 'task_list' %}"><span>Go to main page</span></a>
+     <table class="task_table">
+        <tr>
+            <th>Task name</th>
+            <th>Editor</th>
+            <th>Updated fields</th>
+            <th>Old values</th>
+            <th>New values</th>
+            <th>Occurrence date</th>
+        </tr>
+        {% for event in events %}
+            <tr>
+                <td>{{ event.task.name }}</td>
+                <td>{{ event.user_who_edited }}</td>
+                <td>
+                    {% for field in event.field_to_update %}
+                        {{ field | linebreaks }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for old in event.old_value %}
+                        {{ old | linebreaks }}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for new in event.new_value %}
+                        {{ new | linebreaks }}
+                    {% endfor %}
+                </td>
+            <td>{{ event.occurrence_date }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

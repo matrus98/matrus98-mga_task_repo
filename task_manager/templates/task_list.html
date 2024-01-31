@@ -1,7 +1,8 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <a href="{% url 'task_create_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus">Add new task</span></a>
+    <a href="{% url 'task_create_new' %}" class="top-menu"><span>Add new task</span></a>
+    <a href="{% url 'task_history' %}" class="top-menu"><span>Browse task history</span></a>
     <table class="task_table">
         <tr>
             <th>Task title</th>
