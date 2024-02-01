@@ -3,11 +3,17 @@
 {% block content %}
     <a href="{% url 'task_create_new' %}" class="top-menu"><span>Add new task</span></a>
     <a href="{% url 'task_history' %}" class="top-menu"><span>Browse task history</span></a>
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Apply filter</button>
+    </form>
     <table class="task_table">
         <tr>
             <th>Task title</th>
-            <th>Task author</th>
+            <th>Author</th>
             <th>Assigned user</th>
+            <th>Task status</th>
             <th>Available actions</th>
         </tr>
         {% for task in tasks %}
@@ -15,6 +21,7 @@
                 <td>{{ task.name }}</td>
                 <td>{{ task.author }}</td>
                 <td>{{ task.assigned_user }}</td>
+                <td>{{ task.status }}</td>
                 <td>
                     <button><a href="{% url 'task_details' pk=task.pk %}">Details</a></button>
                     <button><a href="{% url 'task_edit' pk=task.pk %}">Edit</a></button>

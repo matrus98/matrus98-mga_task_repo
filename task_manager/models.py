@@ -3,7 +3,6 @@ from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
 from django.contrib.auth.models import User
-from django.conf import settings
 
 
 TaskStatusChoices = {
@@ -23,7 +22,7 @@ class Task(models.Model):
     task_history = HistoricalRecords()
 
     def __str__(self):
-        return self.name
+        return f'{self.name}, {self.status}, {self.assigned_user}'
 
 
 class HistoricalTaskEvent(models.Model):
@@ -46,3 +45,18 @@ class HistoricalTaskEvent(models.Model):
 
         return ("Task %s has been modified at %s in the following fields:\n%s"
                 .format(self.task_name, self.occurrence_date, msg))
+
+
+TaskFieldToBeFiltered = {
+    'none': 'Do not filter',
+    'name_description': 'Task name and description',
+    'status': 'Task Status',
+    'assigned_user': 'Assigned user',
+}
+
+
+class TaskFilter(models.Model):
+    phrase_string = models.CharField(max_length=100)
+
+    def __str__(self):
+        return 'Filter for phrase: %s' % self.phrase_string

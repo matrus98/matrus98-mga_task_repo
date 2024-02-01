@@ -2,7 +2,7 @@ import copy
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task, HistoricalTaskEvent
-from .froms import TaskForm
+from .froms import TaskForm, FilterTaskForm
 
 
 forbidden_list = ['_state', '_django_version', 'id']
@@ -10,8 +10,24 @@ map_value = 'assigned_user_id'
 
 
 def task_list(request):
-    tasks = Task.objects.all()
-    return render(request, 'task_list.html', {'tasks': tasks})
+    tasks = Task.objects.filter()
+    if request.method == 'POST':
+        filter_task_form = FilterTaskForm(request.POST)
+        if filter_task_form.is_valid():
+            result = filter_task_form.save(commit=False).phrase_string
+
+            chosen_field_for_filtering = request.POST.get('field_to_be_filtered')
+            if chosen_field_for_filtering == 'name_description':
+                tasks = Task.objects.filter(name__icontains=result) | Task.objects.filter(description__icontains=result)
+            elif chosen_field_for_filtering == 'status':
+                tasks = Task.objects.filter(status__icontains=result)
+            elif chosen_field_for_filtering == 'assigned_user':
+                tasks = Task.objects.filter(assigned_user__username__icontains=result)
+
+    else:
+        filter_task_form = FilterTaskForm()
+
+    return render(request, 'task_list.html', {'tasks': tasks, 'form': filter_task_form})
 
 
 def task_create_new(request):
