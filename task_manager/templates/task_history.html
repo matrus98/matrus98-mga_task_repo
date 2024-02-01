@@ -7,32 +7,26 @@
             <th>Task name</th>
             <th>Editor</th>
             <th>Assigned user</th>
-            <th>Updated fields</th>
-            <th>Old values</th>
-            <th>New values</th>
+            <th>Action type</th>
             <th>Occurrence date</th>
+            <th>Modifications</th>
         </tr>
         {% for event in events %}
             <tr>
                 <td>{{ event.task_name }}</td>
                 <td>{{ event.user_who_edited }}</td>
                 <td>{{ event.assigned_user }}</td>
+                <td>{{ event.action }}</td>
+                <td>{{ event.occurrence_date }}</td>
                 <td>
+                    {% load tags %}
                     {% for field in event.fields_to_update %}
-                        {{ field | linebreaks }}
+                        <b>Modification of field:</b> {{ field }}<br/>
+                        <b>From value:</b> {{ event.old_values|index:forloop.counter0 | linebreaks }}
+                        <b>To value:</b> {{ event.new_values|index:forloop.counter0 | linebreaks }}
+                       <hr>
                     {% endfor %}
                 </td>
-                <td>
-                    {% for old in event.old_values %}
-                        {{ old | linebreaks }}
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for new in event.new_values %}
-                        {{ new | linebreaks }}
-                    {% endfor %}
-                </td>
-            <td>{{ event.occurrence_date }}</td>
             </tr>
         {% endfor %}
     </table>

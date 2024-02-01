@@ -31,6 +31,7 @@ class HistoricalTaskEvent(models.Model):
     task_name = models.CharField(max_length=100)
     user_who_edited = models.CharField(max_length=100)
     assigned_user = models.CharField(max_length=100)
+    action = models.CharField(max_length=100)
     fields_to_update = ArrayField(models.CharField(max_length=100), blank=True, null=True)
     old_values = ArrayField(models.TextField(blank=True), blank=True, null=True)
     new_values = ArrayField(models.TextField(blank=True), blank=True, null=True)

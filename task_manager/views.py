@@ -26,6 +26,7 @@ def task_create_new(request):
 
             event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
                                                        user_who_edited=current_user)
+            event.action = 'Create'
             assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
             event.assigned_user = assigned_user
 
@@ -73,6 +74,7 @@ def task_edit(request, pk):
 
             event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
                                                        user_who_edited=current_user)
+            event.action = 'Update'
             assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
             event.assigned_user = assigned_user
 
@@ -106,6 +108,32 @@ def task_edit(request, pk):
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
     task.delete()
+
+    current_user = request.user.username if request.user.username != '' else 'Anonymous'
+    event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
+                                               user_who_edited=current_user)
+    event.action = 'Delete'
+    assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
+    event.assigned_user = assigned_user
+
+    fields = set([atr for atr, value in task.__dict__.items() if atr not in forbidden_list])
+    fields_to_update, old_values, new_values = [], [], []
+    if map_value in fields:
+        fields.remove(map_value)
+        fields_to_update.append('assigned user')
+        old_values.append(assigned_user)
+        new_values.append('---')
+
+    for atr in fields:
+        fields_to_update.append(atr)
+        old_values.append(task.__dict__[atr])
+        new_values.append('---')
+    event.fields_to_update = fields_to_update
+    event.old_values = old_values
+    event.new_values = new_values
+
+    event.save()
+
     return redirect('task_list')
 
 
