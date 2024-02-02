@@ -22,7 +22,8 @@ class Task(models.Model):
     task_history = HistoricalRecords()
 
     def __str__(self):
-        return f'{self.name}, {self.status}, {self.assigned_user}'
+        # return f' Task {self.name} in state {self.status} assigned to {self.assigned_user}'
+        return f'{self.name}'
 
 
 class HistoricalTaskEvent(models.Model):
@@ -37,14 +38,7 @@ class HistoricalTaskEvent(models.Model):
     occurrence_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        msg = ' '.join(
-            ['value of field %s has been changed from %s to %s by user %s'
-             .format(field, old, new) for field, old, new in
-             zip(self.fields_to_update, self.old_values, self.new_values)]
-        )
-
-        return ("Task %s has been modified at %s in the following fields:\n%s"
-                .format(self.task_name, self.occurrence_date, msg))
+        return f"Task {self.task_name} has been modified at %s in the following fields: {self.occurrence_date}"
 
 
 TaskFieldToBeFiltered = {
@@ -60,3 +54,10 @@ class TaskFilter(models.Model):
 
     def __str__(self):
         return 'Filter for phrase: %s' % self.phrase_string
+
+
+class HistoryFilter(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, blank=True, null=True)
+
+    def __str__(self):
+        return 'History filter for Task: {}'.format(self.task)

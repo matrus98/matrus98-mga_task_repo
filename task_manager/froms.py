@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task, TaskFilter, TaskFieldToBeFiltered
+from .models import Task, TaskFilter, TaskFieldToBeFiltered, HistoryFilter
 
 
 class TaskForm(forms.ModelForm):
@@ -14,3 +14,11 @@ class FilterTaskForm(forms.ModelForm):
     class Meta:
         model = TaskFilter
         fields = ['phrase_string']
+
+
+class FilterHistoryForm(forms.ModelForm):
+    task_state_till_date = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}))
+
+    class Meta:
+        model = HistoryFilter
+        fields = ['task']

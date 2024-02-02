@@ -1,8 +1,9 @@
 import copy
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from .models import Task, HistoricalTaskEvent
-from .froms import TaskForm, FilterTaskForm
+from .froms import TaskForm, FilterTaskForm, FilterHistoryForm
 
 
 forbidden_list = ['_state', '_django_version', 'id']
@@ -155,4 +156,22 @@ def task_delete(request, pk):
 
 def task_history(request):
     task_events = HistoricalTaskEvent.objects.all().order_by('-occurrence_date')
-    return render(request, 'task_history.html', {'events': task_events})
+
+    if request.method == 'POST':
+        filter_history_form = FilterHistoryForm(request.POST)
+        if filter_history_form.is_valid():
+            task = filter_history_form.save(commit=False).task
+            if task is not None:
+                dt = request.POST.get('task_state_till_date')
+                timezone_from_datetimefield = timezone.make_aware(
+                    timezone.datetime.strptime(dt, '%Y-%m-%dT%H:%M'),
+                    timezone.get_default_timezone()
+                )
+
+                task_events = (HistoricalTaskEvent.objects.filter(task_id=task.id)
+                               .filter(occurrence_date__lte=timezone_from_datetimefield)
+                               .order_by('-occurrence_date'))
+    else:
+        filter_history_form = FilterHistoryForm()
+
+    return render(request, 'task_history.html', {'events': task_events, 'form': filter_history_form})
