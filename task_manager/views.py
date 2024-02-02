@@ -5,7 +5,6 @@ from django.utils import timezone
 from .models import Task, HistoricalTaskEvent
 from .froms import TaskForm, FilterTaskForm, FilterHistoryForm
 
-
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
 
@@ -156,6 +155,9 @@ def task_delete(request, pk):
 
 def task_history(request):
     task_events = HistoricalTaskEvent.objects.all().order_by('-occurrence_date')
+    display_detailed_history_url = False
+    the_one_task = None
+    timezone_from_datetimefield = None
 
     if request.method == 'POST':
         filter_history_form = FilterHistoryForm(request.POST)
@@ -171,7 +173,34 @@ def task_history(request):
                 task_events = (HistoricalTaskEvent.objects.filter(task_id=task.id)
                                .filter(occurrence_date__lte=timezone_from_datetimefield)
                                .order_by('-occurrence_date'))
+
+                rebuild_task_data = bool(request.POST.get('show_task_data_at_this_time_point'))
+                display_detailed_history_url = True
+                the_one_task = task
+
     else:
         filter_history_form = FilterHistoryForm()
 
-    return render(request, 'task_history.html', {'events': task_events, 'form': filter_history_form})
+    return render(request, 'task_history.html', {'events': task_events,
+                                                 'form': filter_history_form,
+                                                 'display_detailed_url': display_detailed_history_url,
+                                                 'task': the_one_task,
+                                                 'state_date': timezone_from_datetimefield})
+
+
+def task_history_details(request, pk, time):
+    task = get_object_or_404(Task, pk=pk)
+    archival_task = Task.objects.create()
+    archival_task.delete()
+    archival_task.name = 'test'
+
+    events_related_to_task_before_the_set_time = (HistoricalTaskEvent.objects
+                                                  .filter(task_id=task.id)
+                                                  .filter(occurrence_date__lte=time)
+                                                  .order_by('occurrence_date'))
+    for event in events_related_to_task_before_the_set_time:
+        if event.fields_to_update is not None or event.new_values is not None:
+            for field, new_value in zip(event.fields_to_update, event.new_values):
+                archival_task.__dict__[field] = new_value
+
+    return render(request, 'task_history_details.html', {'archival_task': archival_task})
