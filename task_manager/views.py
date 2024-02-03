@@ -123,7 +123,6 @@ def task_edit(request, pk):
 
 def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
-    task.delete()
 
     current_user = request.user.username if request.user.username != '' else 'Anonymous'
     event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
@@ -148,6 +147,7 @@ def task_delete(request, pk):
     event.old_values = old_values
     event.new_values = new_values
 
+    task.delete()
     event.save()
 
     return redirect('task_list')
