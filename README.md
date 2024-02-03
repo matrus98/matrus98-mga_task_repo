@@ -16,10 +16,10 @@ Prerequirements:
 It takes only few steps to launch application - which are:
 <ol>
     <li>
-        Choose empty folder, open here terminal and clone repository: `git clone https://github.com/matrus98/matrus98-mga_task_repo.git`
+        Choose empty folder, open here terminal and clone repository: <code>git clone https://github.com/matrus98/matrus98-mga_task_repo.git</code></li>
     </li>
     <li>
-        Next, run the following command: `docker compose up`
+        Next, run the following command: <code>docker compose up</code>
         Make sure none of ports defined in file '.env' are in use.
     </li>
     <li>
