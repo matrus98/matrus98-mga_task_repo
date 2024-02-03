@@ -1,5 +1,39 @@
-body{
+body {
+  padding-top: 56px; /* Adjusted for fixed navbar */
+}
 
+.navbar {
+  background-color: #001f3f; /* Dark Blue Background */
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #ffffff;
+}
+
+.navbar-dark .navbar-toggler-icon {
+  background-color: #ffffff;
+}
+
+.navbar-dark .navbar-toggler {
+  border-color: #ffffff;
+}
+
+.navbar-dark .navbar-toggler:focus,
+.navbar-dark .navbar-toggler:active {
+  outline: none;
+}
+
+.navbar-dark .navbar-toggler:hover {
+  background-color: #ffffff;
+}
+
+a:hover, a:visited {
+    color: #ffffff;
+    float: left;
+    font-size: 10pt;
+    margin-left: 20px;
+    margin-top: 4px;
+    padding: 10px 0;
 }
 
 h1{

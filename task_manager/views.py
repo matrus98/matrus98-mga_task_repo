@@ -10,7 +10,7 @@ map_value = 'assigned_user_id'
 
 
 def task_list(request):
-    tasks = Task.objects.filter()
+    tasks = Task.objects.all()[::-1]
     if request.method == 'POST':
         filter_task_form = FilterTaskForm(request.POST)
         if filter_task_form.is_valid():
@@ -18,11 +18,11 @@ def task_list(request):
 
             chosen_field_for_filtering = request.POST.get('field_to_be_filtered')
             if chosen_field_for_filtering == 'name_description':
-                tasks = Task.objects.filter(name__icontains=result) | Task.objects.filter(description__icontains=result)
+                tasks = (Task.objects.filter(name__icontains=result) | Task.objects.filter(description__icontains=result))[::-1]
             elif chosen_field_for_filtering == 'status':
-                tasks = Task.objects.filter(status__icontains=result)
+                tasks = Task.objects.filter(status__icontains=result)[::-1]
             elif chosen_field_for_filtering == 'assigned_user':
-                tasks = Task.objects.filter(assigned_user__username__icontains=result)
+                tasks = Task.objects.filter(assigned_user__username__icontains=result)[::-1]
 
     else:
         filter_task_form = FilterTaskForm()

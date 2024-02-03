@@ -1,41 +1,51 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <a href="{% url 'task_list' %}"><span>Go to main page</span></a>
-    <form method="post" class="post-form">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Apply filter</button>
-    </form>
-    {% if display_detailed_url == True %}
-        <a href="{% url 'task_history_details' pk=task.pk time=state_date %}"><span>Show task state at given time</span></a>
-    {% endif %}
-    <table class="task_table">
-        <tr>
-            <th>Task name</th>
-            <th>Editor</th>
-            <th>Assigned user</th>
-            <th>Action type</th>
-            <th>Occurrence date</th>
-            <th>Modifications</th>
-        </tr>
-        {% for event in events %}
-            <tr>
-                <td>{{ event.task_name }}</td>
-                <td>{{ event.user_who_edited }}</td>
-                <td>{{ event.assigned_user }}</td>
-                <td>{{ event.action }}</td>
-                <td>{{ event.occurrence_date }}</td>
-                <td>
-                    {% load tags %}
-                    {% for field in event.fields_to_update %}
-                        <b>Modification of field:</b> {{ field }}<br/>
-                        <b>From value:</b> {{ event.old_values|index:forloop.counter0 | linebreaks }}
-                        <b>To value:</b> {{ event.new_values|index:forloop.counter0 | linebreaks }}
-                       <hr>
+    <div class="modal-body row">
+        <div class="col-md-2">
+            <br/>
+            <form method="post" class="post-form">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button class="btn btn-primary" type="submit">Apply filter</button>
+            </form>
+        {% if display_detailed_url == True %}
+            <a href="{% url 'task_history_details' pk=task.pk time=state_date %}">
+                <button class="btn btn-info">Show task state at given time</button>
+            </a>
+        {% endif %}
+        </div>
+        <div class="col-md-10">
+            <div class="container mt-5">
+                <table class="table table-striped table-hover">
+                    <tr>
+                        <th>Task name</th>
+                        <th>Editor</th>
+                        <th>Assigned user</th>
+                        <th>Action type</th>
+                        <th>Occurrence date</th>
+                        <th>Modifications</th>
+                    </tr>
+                    {% for event in events %}
+                        <tr>
+                            <td>{{ event.task_name }}</td>
+                            <td>{{ event.user_who_edited }}</td>
+                            <td>{{ event.assigned_user }}</td>
+                            <td>{{ event.action }}</td>
+                            <td>{{ event.occurrence_date }}</td>
+                            <td>
+                                {% load tags %}
+                                {% for field in event.fields_to_update %}
+                                    <b>Modification of field:</b> {{ field }}<br/>
+                                    <b>From value:</b> {{ event.old_values|index:forloop.counter0 | linebreaks }}
+                                    <b>To value:</b> {{ event.new_values|index:forloop.counter0 | linebreaks }}
+                                   <hr>
+                                {% endfor %}
+                            </td>
+                        </tr>
                     {% endfor %}
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

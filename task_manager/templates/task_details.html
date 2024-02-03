@@ -1,11 +1,9 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <a href="{% url 'task_list' %}"><span>Go to main page</span></a>
-    <a href="{% url 'task_edit' pk=task.pk %}"><span>Edit task</span></a>
     <h2>Task name: {{ task.name }}</h2>
 {#    {%  if user.is_authenticated %}#}
-        <br/>
+    <a href="{% url 'task_edit' pk=task.pk %}"><button class="btn btn-primary">Edit task</button></a>
 {#    {% endif %}#}
     <h3>Task status: {{ task.status }}</h3>
     <h3>Assigned User: {{ task.assigned_user }}</h3>

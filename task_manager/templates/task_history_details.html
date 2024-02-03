@@ -1,7 +1,6 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <a href="{% url 'task_list' %}"><span>Go to main page</span></a><br/>
     Archival name of task:{{ archival_task.name | linebreaks }}
     Task author: {{ archival_task.author | linebreaks }}
     Task description: {{ archival_task.description | linebreaks }}
