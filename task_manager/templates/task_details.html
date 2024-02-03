@@ -1,12 +1,11 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    <h2>Task name: {{ task.name }}</h2>
+    <h2>Task name:</h2>{{ task.name|linebreaks }}
+    <b>Task status:</b>{{ task.status|linebreaks }}
+    <b>Assigned User:</b>{{ task.assigned_user|linebreaks }}
+    <b>Task description:</b>{{ task.description|linebreaks }}
 {#    {%  if user.is_authenticated %}#}
     <a href="{% url 'task_edit' pk=task.pk %}"><button class="btn btn-primary">Edit task</button></a>
 {#    {% endif %}#}
-    <h3>Task status: {{ task.status }}</h3>
-    <h3>Assigned User: {{ task.assigned_user }}</h3>
-    <h4>Task description:</h4>
-    <p>{{ task.description|linebreaksbr }}</p>
 {% endblock %}

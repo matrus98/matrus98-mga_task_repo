@@ -1,9 +1,10 @@
 {% extends 'index.html' %}
 
 {% block content %}
-    Archival name of task:{{ archival_task.name | linebreaks }}
-    Task author: {{ archival_task.author | linebreaks }}
-    Task description: {{ archival_task.description | linebreaks }}
-    Task status: {{ archival_task.status | linebreaks }}
-    Task assigned_user: {{ archival_task.assigned_user | linebreaks }}
+    <br/>
+    <h2>Archival name of task at {{ time }}:</h2>{{ archival_task.name | linebreaks }}
+    <b>Task author:</b>{{ archival_task.author | linebreaks }}
+    <b>Task description:</b>{{ archival_task.description | linebreaks }}
+    <b>Task status:</b>{{ archival_task.status | linebreaks }}
+    <b>Task assigned_user:</b>{{ archival_task.assigned_user | linebreaks }}
 {% endblock %}

@@ -190,9 +190,9 @@ def task_history(request):
 
 def task_history_details(request, pk, time):
     task = get_object_or_404(Task, pk=pk)
-    archival_task = Task.objects.create()
-    archival_task.delete()
-    archival_task.name = 'test'
+    # archival_task = Task.objects.create()
+    archival_task = Task()
+    # archival_task.delete()
 
     events_related_to_task_before_the_set_time = (HistoricalTaskEvent.objects
                                                   .filter(task_id=task.id)
@@ -203,4 +203,5 @@ def task_history_details(request, pk, time):
             for field, new_value in zip(event.fields_to_update, event.new_values):
                 archival_task.__dict__[field] = new_value
 
-    return render(request, 'task_history_details.html', {'archival_task': archival_task})
+    return render(request, 'task_history_details.html',
+                  {'archival_task': archival_task, 'time': time})
