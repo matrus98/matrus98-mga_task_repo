@@ -26,7 +26,7 @@ It takes only few steps to launch application - which are:
     <li>
         Log into container 'my_web_app'. At this point application will not work until migration is done.
         To achieve this run the following commands:
-        <code>python manage.py makemigrations</code>
+        <code>python manage.py makemigrations</code> and
         <code>python manage.py migrate</code>
     </li>
     <li>
