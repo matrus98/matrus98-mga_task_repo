@@ -1,46 +1,38 @@
-body {
-  padding-top: 56px; /* Adjusted for fixed navbar */
+.navbar {
+    background-color: #001f3f; /* Dark Blue Background */
 }
 
-.navbar {
-  background-color: #001f3f; /* Dark Blue Background */
+.navbar .navbar-nav .nav-link:hover {
+    background-color: lightblue;
+    color: #fff;
 }
 
 .navbar-dark .navbar-nav .nav-link {
-  color: #ffffff;
+    color: #ffffff;
 }
 
 .navbar-dark .navbar-toggler-icon {
-  background-color: #ffffff;
+    background-color: #ffffff;
 }
 
 .navbar-dark .navbar-toggler {
-  border-color: #ffffff;
+    border-color: #ffffff;
 }
 
 .navbar-dark .navbar-toggler:focus,
 .navbar-dark .navbar-toggler:active {
-  outline: none;
+    outline: none;
 }
 
 .navbar-dark .navbar-toggler:hover {
-  background-color: #ffffff;
+    background-color: #ffffff;
 }
 
-a:hover, a:visited {
-    color: #ffffff;
-    float: left;
-    font-size: 10pt;
-    margin-left: 20px;
-    margin-top: 4px;
-    padding: 10px 0;
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: darkcyan;
+    color: white;
 }
 
-h1{
-    padding: 10px;
-}
-
-.task_table td, .task_table th{
-    border: 1px solid black;
-    padding: 10px;
+th, td {
+    text-align: center;
 }

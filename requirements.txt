@@ -1,6 +1,5 @@
 django
 pytest
 gunicorn
-django-simple-history
 django-crispy-forms
 crispy-bootstrap5
