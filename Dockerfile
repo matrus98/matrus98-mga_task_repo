@@ -13,6 +13,9 @@ COPY . .
 RUN pip install psycopg2-binary
 RUN pip install -r ./requirements.txt
 
+RUN mkdir ${app_root}/task_manager/migrations
+RUN touch ${app_root}/task_manager/migrations/__init__.py
+
 RUN mkdir -p /tmp/gunicorn
 RUN adduser -D guni_container_king
 RUN chown guni_container_king.guni_container_king /tmp/gunicorn/ -R

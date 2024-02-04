@@ -9,3 +9,4 @@ postgres_data
 **Dockerfile
 README.md
 notatki.txt
+task_manager/migrations
