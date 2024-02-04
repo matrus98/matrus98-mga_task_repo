@@ -2,6 +2,7 @@
 <ul>
     <li>Python</li>
     <li>Django</li>
+    <li>Django REST framework</li>
     <li>Gunicorn</li>
     <li>Postgresql</li>
     <li>Docker</li>

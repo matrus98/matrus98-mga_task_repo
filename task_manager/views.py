@@ -155,7 +155,7 @@ def task_delete(request, pk):
 
 def task_history(request):
     task_events = HistoricalTaskEvent.objects.all().order_by('-occurrence_date')
-    display_detailed_history_url = False
+    display_detailed_history_url_button = False
     the_one_task = None
     timezone_from_datetimefield = None
 
@@ -174,8 +174,7 @@ def task_history(request):
                                .filter(occurrence_date__lte=timezone_from_datetimefield)
                                .order_by('-occurrence_date'))
 
-                rebuild_task_data = bool(request.POST.get('show_task_data_at_this_time_point'))
-                display_detailed_history_url = True
+                display_detailed_history_url_button = True
                 the_one_task = task
 
     else:
@@ -183,16 +182,14 @@ def task_history(request):
 
     return render(request, 'task_history.html', {'events': task_events,
                                                  'form': filter_history_form,
-                                                 'display_detailed_url': display_detailed_history_url,
+                                                 'display_detailed_url': display_detailed_history_url_button,
                                                  'task': the_one_task,
                                                  'state_date': timezone_from_datetimefield})
 
 
 def task_history_details(request, pk, time):
     task = get_object_or_404(Task, pk=pk)
-    # archival_task = Task.objects.create()
     archival_task = Task()
-    # archival_task.delete()
 
     events_related_to_task_before_the_set_time = (HistoricalTaskEvent.objects
                                                   .filter(task_id=task.id)
