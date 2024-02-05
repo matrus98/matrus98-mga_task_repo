@@ -37,7 +37,7 @@ def task_create_new(request):
         name=request.data.get('name'),
         description=request.data.get('description'),
         status=request.data.get('status'),
-        assigned_user=request.data.get('assigned_user')
+        assigned_user=request.data.get('assigned_user') if request.data.get('assigned_user') is not '' else None
     )
 
     user_who_edited = request.data.get('user_who_edited') if 'user_who_edited' in request.data else ('HTTP API '
@@ -162,12 +162,16 @@ def task_history(request):
         task_events = HistoricalTaskEvent.objects.all().order_by('-occurrence_date')
 
     elif request.method == 'POST':
-        task_state_till_date = request.data.get('time') if 'time' in request.data else timezone.now()
-        task_state_till_date = task_state_till_date[:task_state_till_date.find(':', task_state_till_date.find(':')+1)]
-        timezone_from_datetimefield = timezone.make_aware(
-            timezone.datetime.strptime(task_state_till_date, '%Y-%m-%dT%H:%M'),
-            timezone.get_default_timezone()
-        )
+        if 'time' in request.data:
+            task_state_till_date = request.data.get('time')
+            if task_state_till_date.count(':') > 1:
+                task_state_till_date = task_state_till_date[:task_state_till_date.find(':', task_state_till_date.find(':')+1)]
+            timezone_from_datetimefield = timezone.make_aware(
+                timezone.datetime.strptime(task_state_till_date, '%Y-%m-%dT%H:%M'),
+                timezone.get_default_timezone()
+            )
+        else:
+            timezone_from_datetimefield = timezone.now()
 
         task_events = (HistoricalTaskEvent.objects
                        .filter(task_id=request.data.get('id'))
@@ -182,9 +186,10 @@ def task_history(request):
 def task_history_details(request, pk, time):
     archival_task = Task()
 
-    task_state_till_date = time[:time.find(':', time.find(':') + 1)]
+    if time.count(':') > 1:
+        time = time[:time.find(':', time.find(':') + 1)]
     timezone_from_datetimefield = timezone.make_aware(
-        timezone.datetime.strptime(task_state_till_date, '%Y-%m-%dT%H:%M'),
+        timezone.datetime.strptime(time, '%Y-%m-%dT%H:%M'),
         timezone.get_default_timezone()
     )
 
