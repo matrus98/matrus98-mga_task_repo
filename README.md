@@ -21,7 +21,7 @@ It takes only few steps to launch application - which are:
         In case lacking of git tool just download repository as zip file
     </li>
     <li>
-        Next, run the following command: <code>docker compose up</code>
+        Next, run the following command (in directory where 'docker-compose.yml' file is present): <code>docker compose up</code>
         Make sure none of ports defined in file '.env' are in use.
     </li>
     <li>
@@ -29,6 +29,7 @@ It takes only few steps to launch application - which are:
         To achieve this run the following commands:
         <code>python manage.py makemigrations</code> and
         <code>python manage.py migrate</code>
+        Database system is going to create 'postgres_data' folder in the same location as 'docker-compose.yml'. Since this folder exists there is no need to run these commands on next launch of cointainers.
     </li>
     <li>
         Actually that's it! Type in browser: <a href="http://localhost:80">localhost</a> and enjoy the application!
