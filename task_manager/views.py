@@ -43,7 +43,7 @@ def task_create_new(request):
             event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
                                                        user_who_edited=current_user)
             event.action = 'Create'
-            assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
+            assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
             event.assigned_user = assigned_user
 
             fields = set([atr for atr, value in task.__dict__.items() if atr not in forbidden_list])
@@ -91,7 +91,7 @@ def task_edit(request, pk):
             event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
                                                        user_who_edited=current_user)
             event.action = 'Update'
-            assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
+            assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
             event.assigned_user = assigned_user
 
             fields_where_change_occurred = set([atr for atr, value in
@@ -101,7 +101,7 @@ def task_edit(request, pk):
             if map_value in fields_where_change_occurred:
                 fields_where_change_occurred.remove(map_value)
                 fields_to_update.append('assigned user')
-                old_values.append(task_old.assigned_user.username if task_old.assigned_user is not None else '---')
+                old_values.append(task_old.assigned_user.username if task_old.assigned_user != None else '---')
                 new_values.append(assigned_user)
 
             for atr in fields_where_change_occurred:
@@ -128,7 +128,7 @@ def task_delete(request, pk):
     event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
                                                user_who_edited=current_user)
     event.action = 'Delete'
-    assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
+    assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
     event.assigned_user = assigned_user
 
     fields = set([atr for atr, value in task.__dict__.items() if atr not in forbidden_list])
@@ -163,7 +163,7 @@ def task_history(request):
         filter_history_form = FilterHistoryForm(request.POST)
         if filter_history_form.is_valid():
             task = filter_history_form.save(commit=False).task
-            if task is not None:
+            if task != None:
                 dt = request.POST.get('task_state_till_date')
                 timezone_from_datetimefield = timezone.make_aware(
                     timezone.datetime.strptime(dt, '%Y-%m-%dT%H:%M'),
@@ -196,7 +196,7 @@ def task_history_details(request, pk, time):
                                                   .filter(occurrence_date__lte=time)
                                                   .order_by('occurrence_date'))
     for event in events_related_to_task_before_the_set_time:
-        if event.fields_to_update is not None or event.new_values is not None:
+        if event.fields_to_update != None or event.new_values != None:
             for field, new_value in zip(event.fields_to_update, event.new_values):
                 archival_task.__dict__[field] = new_value
 
