@@ -2,6 +2,7 @@ import copy
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import status
 from task_manager.models import Task, HistoricalTaskEvent
 from .serializers import TaskSerializer, HistoricalTaskEventSerializer
 from django.utils import timezone
@@ -19,13 +20,17 @@ def task_list(request):
     elif request.method == 'POST':
         phrase_string = request.data.get('phrase_string')
         chosen_field_for_filtering = request.data.get('field_to_be_filtered')
-        if chosen_field_for_filtering == 'name_description':
+        if chosen_field_for_filtering == 'none':
+            tasks = Task.objects.all()
+        elif chosen_field_for_filtering == 'name_description':
             tasks = (Task.objects.filter(name__icontains=phrase_string) |
                      Task.objects.filter(description__icontains=phrase_string))[::-1]
         elif chosen_field_for_filtering == 'status':
             tasks = Task.objects.filter(status__icontains=phrase_string)[::-1]
         elif chosen_field_for_filtering == 'assigned_user':
             tasks = Task.objects.filter(assigned_user__username__icontains=phrase_string)[::-1]
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     serializer = TaskSerializer(tasks, many=True)
     return Response(serializer.data)

@@ -1,3 +1,5 @@
 mga_venv/
 postgres_data/
 *.idea/
+**.pytest_cache
+**__pycache__

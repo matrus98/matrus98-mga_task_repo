@@ -1,6 +1,7 @@
 # This project shows skills of usage the following technologies:
 <ul>
     <li>Python</li>
+    <li>Pytest</li>
     <li>Django</li>
     <li>Django REST framework</li>
     <li>Gunicorn</li>
@@ -37,14 +38,27 @@ It takes only few steps to launch application - which are:
 </ol>
 
 To test HTTP API Endpoints 'curl' tool might be used. Below are listed examples to test them. Watch the syntax. Author was using Windows operating system and got 'curl' tool <a href="https://curl.se/windows/">from this page</a>, opened PowerShell in directory where executable file was stored (of course it could be added to enviromental variable PATH):
+
 * Create new task: <code>curl.exe -X POST -d 'name=TestJSON&description=I hope it is gonna work&user_who_edited=Anonymous&status=Nowy&assigned_user=' http://localhost/api/task/new </code>
+
 * Get all tasks: <code>curl.exe http://localhost/api/ </code>
+
 * Get filtered tasks: <code>curl.exe -X POST -d 'phrase_string=p&field_to_be_filtered=name_description' http://localhost/api/ </code>
+Possible values for 'field_to_be_filtered' are: name_description (filter by phrase in name or description of task), status (filter by status), assigned_user (filter by user which is assigned to tasks)
+
 * Get task details: <code>curl.exe http://localhost/api/task/<task_id> </code>
+
 * Edit task data: <code>curl.exe -X PATCH -d 'description=New examples description&status=Rozwiązany' http://localhost/api/task/<task_id>/edit </code>
+
 * Delete task: <code>curl.exe -X DELETE http://localhost/api/task/<task_id>/delete </code>
-* Get events (what action took place and which task it applied to): curl.exe http://localhost/api/task/history
-* Get events for particular task till certain date: </code>curl.exe -X POST -d 'id=<task_id>&time=<time>' http://localhost/api/task/history </code>
-This works event if task no longer exists in database (requires knowing what 'id' it had and we know that the 'id' is unique). Time can be promped in either format "2024-02-05T12:30:51.162912Z" or "2024-02-05T12:30". It refers to example date 5th February 2024 12:30. If no time is provided then all events are returned, and thus command <code>curl.exe -X POST -d 'id=<task_id>&time=<time>' http://localhost/api/task/history </code> get every event related to given task up to current time
-* Rebuild task to its state on given time: <code>curl.exe http://localhost/api/task/history/<task_id>/<time> </code>
+
+* Get events (what action took place and which task it applied to): <code>curl.exe http://localhost/api/task/history </code>
+
+* Get events for particular task till certain date: <code>curl.exe -X POST -d 'id=<task_id>&time=time' http://localhost/api/task/history </code>
+This works event if task no longer exists in database (requires knowing what 'id' it had and we know that the 'id' is unique). Time can be promped in either format "2024-02-05T12:30:51.162912Z" or "2024-02-05T12:30". It refers to example date 5th February 2024 12:30. If no time is provided then all events are returned, and thus command <code>curl.exe -X POST -d 'id=<task_id>' http://localhost/api/task/history </code> get every event related to given task up to current time.
+
+* Rebuild task to its state on given time: <code>curl.exe http://localhost/api/task/history/<task_id>/time </code>
 Time can be promped in either format "2024-02-05T12:30:51.162912Z" or "2024-02-05T12:30". It refers to example date 5th February 2024 12:30.
+
+To run tests run command <code>pytest</code> in root directoy of application. Below is attached screen which run tests only written for 'task_api' module.<br/><br/>
+![Pytest screen](test_screen.png)
