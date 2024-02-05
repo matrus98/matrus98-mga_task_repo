@@ -6,7 +6,6 @@ from task_manager.models import Task, HistoricalTaskEvent
 from .serializers import TaskSerializer, HistoricalTaskEventSerializer
 from django.utils import timezone
 
-
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
 
@@ -45,7 +44,7 @@ def task_create_new(request):
                                                                                                      'Endpoint has '
                                                                                                      'been used')
     event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
-                                                       user_who_edited=user_who_edited)
+                                               user_who_edited=user_who_edited)
     event.action = 'Create (API)'
     assigned_user = task.assigned_user.username if task.assigned_user is not None else '---'
     event.assigned_user = assigned_user
@@ -163,27 +162,41 @@ def task_history(request):
         task_events = HistoricalTaskEvent.objects.all().order_by('-occurrence_date')
 
     elif request.method == 'POST':
-        task = Task.objects.get(request.data.get('pk'))
-        if task is not None:
-            archival_task = Task()
-            task_state_till_date = request.data.get('time') if 'time' in request.data else timezone.now()
-            timezone_from_datetimefield = timezone.make_aware(
-                timezone.datetime.strptime(task_state_till_date, '%Y-%m-%dT%H:%M'),
-                timezone.get_default_timezone()
-            )
+        task_state_till_date = request.data.get('time') if 'time' in request.data else timezone.now()
+        task_state_till_date = task_state_till_date[:task_state_till_date.find(':', task_state_till_date.find(':')+1)]
+        timezone_from_datetimefield = timezone.make_aware(
+            timezone.datetime.strptime(task_state_till_date, '%Y-%m-%dT%H:%M'),
+            timezone.get_default_timezone()
+        )
 
-            events_related_to_task_before_the_set_time = (HistoricalTaskEvent.objects
-                                                          .filter(task_id=task.id)
-                                                          .filter(occurrence_date__lte=timezone_from_datetimefield)
-                                                          .order_by('occurrence_date'))
-
-            for event in events_related_to_task_before_the_set_time:
-                if event.fields_to_update is not None or event.new_values is not None:
-                    for field, new_value in zip(event.fields_to_update, event.new_values):
-                        archival_task.__dict__[field] = new_value
-
-            serializer = TaskSerializer(archival_task)
-            return Response(serializer.data)
+        task_events = (HistoricalTaskEvent.objects
+                       .filter(task_id=request.data.get('id'))
+                       .filter(occurrence_date__lte=timezone_from_datetimefield)
+                       .order_by('occurrence_date'))
 
     serializer = HistoricalTaskEventSerializer(task_events, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def task_history_details(request, pk, time):
+    archival_task = Task()
+
+    task_state_till_date = time[:time.find(':', time.find(':') + 1)]
+    timezone_from_datetimefield = timezone.make_aware(
+        timezone.datetime.strptime(task_state_till_date, '%Y-%m-%dT%H:%M'),
+        timezone.get_default_timezone()
+    )
+
+    events_related_to_task_before_the_set_time = (HistoricalTaskEvent.objects
+                                                  .filter(task_id=pk)
+                                                  .filter(occurrence_date__lte=timezone_from_datetimefield)
+                                                  .order_by('occurrence_date'))
+
+    for event in events_related_to_task_before_the_set_time:
+        if event.fields_to_update is not None or event.new_values is not None:
+            for field, new_value in zip(event.fields_to_update, event.new_values):
+                archival_task.__dict__[field] = new_value
+
+    serializer = TaskSerializer(archival_task)
     return Response(serializer.data)
