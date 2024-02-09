@@ -46,17 +46,3 @@ TaskFieldToBeFiltered = {
     'status': 'Task Status',
     'assigned_user': 'Assigned user',
 }
-
-
-class TaskFilter(models.Model):
-    phrase_string = models.CharField(max_length=100)
-
-    def __str__(self):
-        return 'Filter for phrase: %s' % self.phrase_string
-
-
-class HistoryFilter(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, blank=True, null=True)
-
-    def __str__(self):
-        return 'History filter for Task: {}'.format(self.task)

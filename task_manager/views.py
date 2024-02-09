@@ -144,8 +144,8 @@ def task_history(request):
                                             queryset=HistoricalTaskEvent.objects.all().order_by('-occurrence_date'))
     display_detailed_history_url_button = False
     the_one_task = None
-    time_f = task_events_filter.data.get('occurrence_date')
-    timezone_from_datetimefield = time_f if time_f != '' else timezone.now()
+    timezone_from_datetimefield = None
+
     if request.method == 'POST':
         pk = task_events_filter.data.get('task')
         if pk.isdigit():
@@ -153,6 +153,8 @@ def task_history(request):
             if task != None:
                 display_detailed_history_url_button = True
                 the_one_task = task
+                time_f = task_events_filter.data.get('occurrence_date')
+                timezone_from_datetimefield = time_f if time_f != '' else timezone.now()
 
     return render(request, 'task_history.html', {'events': task_events_filter.qs,
                                                  'form': task_events_filter.form,
