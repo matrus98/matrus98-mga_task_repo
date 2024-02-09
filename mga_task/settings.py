@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'task_manager',
     'task_api',
-    'rest_framework'
+    'rest_framework',
+    'django_filters',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
