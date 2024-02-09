@@ -17,7 +17,7 @@ class Task(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     status = models.CharField(choices=TaskStatusChoices, default='CREATED')
-    assigned_user = models.ForeignKey(User, on_delete=models.DO_NOTHING, blank=True, null=True)
+    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         # return f' Task {self.name} in state {self.status} assigned to {self.assigned_user}'
@@ -25,7 +25,8 @@ class Task(models.Model):
 
 
 class HistoricalTaskEvent(models.Model):
-    task_id = models.CharField(max_length=100)
+    task = models.ForeignKey(Task, on_delete=models.SET_NULL, blank=True, null=True)
+    historical_task_id = models.CharField(max_length=100)
     task_name = models.CharField(max_length=100)
     user_who_edited = models.CharField(max_length=100)
     assigned_user = models.CharField(max_length=100)
@@ -36,7 +37,7 @@ class HistoricalTaskEvent(models.Model):
     occurrence_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Task {self.task_name} has been modified at %s in the following fields: {self.occurrence_date}"
+        return f"Task {self.task_name} has been modified at: {self.occurrence_date}"
 
 
 TaskFieldToBeFiltered = {

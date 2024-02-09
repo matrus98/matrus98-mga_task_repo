@@ -6,6 +6,7 @@ from rest_framework import status
 from task_manager.models import Task, HistoricalTaskEvent
 from .serializers import TaskSerializer, HistoricalTaskEventSerializer
 from django.utils import timezone
+from task_manager.filters import TaskFilter
 
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
@@ -15,7 +16,7 @@ map_value = 'assigned_user_id'
 def task_list(request):
     tasks = None
     if request.method == 'GET':
-        tasks = Task.objects.all()
+        task_filter = TaskFilter(request.GET, queryset=Task.objects.all())  # Task.objects.all()
 
     elif request.method == 'POST':
         phrase_string = request.data.get('phrase_string')

@@ -3,31 +3,17 @@ import copy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .models import Task, HistoricalTaskEvent
-from .froms import TaskForm, FilterTaskForm, FilterHistoryForm
+from .froms import TaskForm
+from .filters import TaskFilter, HistoricalTaskEventFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
 
 
 def task_list(request):
-    tasks = Task.objects.all()[::-1]
-    if request.method == 'POST':
-        filter_task_form = FilterTaskForm(request.POST)
-        if filter_task_form.is_valid():
-            result = filter_task_form.save(commit=False).phrase_string
-
-            chosen_field_for_filtering = request.POST.get('field_to_be_filtered')
-            if chosen_field_for_filtering == 'name_description':
-                tasks = (Task.objects.filter(name__icontains=result) | Task.objects.filter(description__icontains=result))[::-1]
-            elif chosen_field_for_filtering == 'status':
-                tasks = Task.objects.filter(status__icontains=result)[::-1]
-            elif chosen_field_for_filtering == 'assigned_user':
-                tasks = Task.objects.filter(assigned_user__username__icontains=result)[::-1]
-
-    else:
-        filter_task_form = FilterTaskForm()
-
-    return render(request, 'task_list.html', {'tasks': tasks, 'form': filter_task_form})
+    task_filter = TaskFilter(request.POST, queryset=Task.objects.all())
+    return render(request, 'task_list.html', {'tasks': task_filter.qs[::-1], 'form': task_filter.form})
 
 
 def task_create_new(request):
@@ -40,7 +26,7 @@ def task_create_new(request):
             task.author = current_user
             task.save()
 
-            event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
+            event = HistoricalTaskEvent.objects.create(task=task, historical_task_id=task.id, task_name=task.name,
                                                        user_who_edited=current_user)
             event.action = 'Create'
             assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
@@ -88,7 +74,7 @@ def task_edit(request, pk):
             task = task_edit_form.save(commit=False)
             task.save()
 
-            event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
+            event = HistoricalTaskEvent.objects.create(task=task, historical_task_id=task.id, task_name=task.name,
                                                        user_who_edited=current_user)
             event.action = 'Update'
             assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
@@ -125,7 +111,7 @@ def task_delete(request, pk):
     task = get_object_or_404(Task, pk=pk)
 
     current_user = request.user.username if request.user.username != '' else 'Anonymous'
-    event = HistoricalTaskEvent.objects.create(task_id=task.id, task_name=task.name,
+    event = HistoricalTaskEvent.objects.create(task=task, historical_task_id=task.id, task_name=task.name,
                                                user_who_edited=current_user)
     event.action = 'Delete'
     assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
@@ -147,41 +133,29 @@ def task_delete(request, pk):
     event.old_values = old_values
     event.new_values = new_values
 
-    task.delete()
     event.save()
+    task.delete()
 
     return redirect('task_list')
 
 
 def task_history(request):
-    task_events = HistoricalTaskEvent.objects.all().order_by('-occurrence_date')
+    task_events_filter = HistoricalTaskEventFilter(request.POST,
+                                            queryset=HistoricalTaskEvent.objects.all().order_by('-occurrence_date'))
     display_detailed_history_url_button = False
     the_one_task = None
-    timezone_from_datetimefield = None
-
+    time_f = task_events_filter.data.get('occurrence_date')
+    timezone_from_datetimefield = time_f if time_f != '' else timezone.now()
     if request.method == 'POST':
-        filter_history_form = FilterHistoryForm(request.POST)
-        if filter_history_form.is_valid():
-            task = filter_history_form.save(commit=False).task
+        pk = task_events_filter.data.get('task')
+        if pk.isdigit():
+            task = get_object_or_404(Task, pk=pk)
             if task != None:
-                dt = request.POST.get('task_state_till_date')
-                timezone_from_datetimefield = timezone.make_aware(
-                    timezone.datetime.strptime(dt, '%Y-%m-%dT%H:%M'),
-                    timezone.get_default_timezone()
-                )
-
-                task_events = (HistoricalTaskEvent.objects.filter(task_id=task.id)
-                               .filter(occurrence_date__lte=timezone_from_datetimefield)
-                               .order_by('-occurrence_date'))
-
                 display_detailed_history_url_button = True
                 the_one_task = task
 
-    else:
-        filter_history_form = FilterHistoryForm()
-
-    return render(request, 'task_history.html', {'events': task_events,
-                                                 'form': filter_history_form,
+    return render(request, 'task_history.html', {'events': task_events_filter.qs,
+                                                 'form': task_events_filter.form,
                                                  'display_detailed_url': display_detailed_history_url_button,
                                                  'task': the_one_task,
                                                  'state_date': timezone_from_datetimefield})
@@ -192,7 +166,7 @@ def task_history_details(request, pk, time):
     archival_task = Task()
 
     events_related_to_task_before_the_set_time = (HistoricalTaskEvent.objects
-                                                  .filter(task_id=task.id)
+                                                  .filter(historical_task_id=task.id)
                                                   .filter(occurrence_date__lte=time)
                                                   .order_by('occurrence_date'))
     for event in events_related_to_task_before_the_set_time:
