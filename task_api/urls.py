@@ -2,12 +2,12 @@ from django.urls import path, include
 from rest_framework import routers
 
 from . import views
-from . import views_ModelViewSet
-from . import  views_ModelViewSet_History
+from . import views_ModelViewSet_Task
+from . import views_ModelViewSet_History
 
-router = routers.DefaultRouter()
-router.register('task', views_ModelViewSet.TaskModelViewSet)
-router.register('task/history', views_ModelViewSet_History.HistoryModelViewSet)
+router = routers.SimpleRouter()
+router.register('task', views_ModelViewSet_Task.TaskModelViewSet)
+router.register('history', views_ModelViewSet_History.HistoryModelViewSet)
 
 urlpatterns = [
     # path('', views.task_list),

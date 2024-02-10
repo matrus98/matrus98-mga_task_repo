@@ -6,7 +6,7 @@ from rest_framework import status
 from task_manager.models import Task, HistoricalTaskEvent
 from .serializers import TaskSerializer, HistoricalTaskEventSerializer
 from django.utils import timezone
-from task_manager.filters import TaskFilter
+from .filters import TaskFilter
 
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'

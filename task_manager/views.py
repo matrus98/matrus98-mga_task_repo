@@ -2,15 +2,14 @@ import copy
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .models import Task, HistoricalTaskEvent
+from task_manager.models import Task, HistoricalTaskEvent
 from .froms import TaskForm
 from .filters import TaskFilter, HistoricalTaskEventFilter
 
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
 
-# request na 2x API, jedno do tasków, drugie do historii
-# http://127.0.0.1:8000/api/test/?status=Nowy w get'cie dawać odpowiedni link do filtracji i będzie cycuś glancuś
+
 def task_list(request):
     task_filter = TaskFilter(request.POST, queryset=Task.objects.all())
     return render(request, 'task_list.html', {'tasks': task_filter.qs[::-1], 'form': task_filter.form})

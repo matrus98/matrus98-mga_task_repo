@@ -1,19 +1,37 @@
 import copy
+import requests
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from .models import Task, HistoricalTaskEvent
-from .froms import TaskForm
+from .froms import TaskForm, FilterTaskForm, FilterHistoryForm
 from .filters import TaskFilter, HistoricalTaskEventFilter
+from os import environ as envs
+from os.path import join
 
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
+ROOT_ENDPOINT = 'http://localhost:{}/api/' \
+                    .format(envs['MY_WEB_APP_EXTERNAL_PORT'] if 'is_docker_running_env_variable' in envs else '8000')
 
-# request na 2x API, jedno do tasków, drugie do historii
-# http://127.0.0.1:8000/api/test/?status=Nowy w get'cie dawać odpowiedni link do filtracji i będzie cycuś glancuś
+
 def task_list(request):
-    task_filter = TaskFilter(request.POST, queryset=Task.objects.all())
-    return render(request, 'task_list.html', {'tasks': task_filter.qs[::-1], 'form': task_filter.form})
+    tasks = None
+    filter_task_form = None
+
+    if request.method == 'GET':
+        tasks = requests.get(ROOT_ENDPOINT + 'task/').json()
+        filter_task_form = FilterTaskForm()
+    if request.method == 'POST':
+        filter_task_form = FilterTaskForm(request.POST)
+        if filter_task_form.is_valid():
+            form_parameters = filter_task_form.cleaned_data
+            end_point = ROOT_ENDPOINT + 'task/?'
+            for key in form_parameters:
+                end_point += f'{key}={form_parameters[key]}&'
+            tasks = requests.get(end_point).json()
+
+    return render(request, 'task_list.html', {'tasks': tasks[::-1], 'form': filter_task_form})
 
 
 def task_create_new(request):
@@ -21,34 +39,12 @@ def task_create_new(request):
         task_creation_form = TaskForm(request.POST)
 
         if task_creation_form.is_valid():
-            task = task_creation_form.save(commit=False)
+            end_point = ROOT_ENDPOINT + 'task/'
+            task_msg = task_creation_form.cleaned_data
             current_user = request.user.username if request.user.username != '' else 'Anonymous'
-            task.author = current_user
-            task.save()
+            task_msg['author'] = current_user
 
-            event = HistoricalTaskEvent.objects.create(task=task, historical_task_id=task.id, task_name=task.name,
-                                                       user_who_edited=current_user)
-            event.action = 'Create'
-            assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
-            event.assigned_user = assigned_user
-
-            fields = set([atr for atr, value in task.__dict__.items() if atr not in forbidden_list])
-            fields_to_update, old_values, new_values = [], [], []
-            if map_value in fields:
-                fields.remove(map_value)
-                fields_to_update.append('assigned user')
-                old_values.append('---')
-                new_values.append(assigned_user)
-
-            for atr in fields:
-                fields_to_update.append(atr)
-                old_values.append('---')
-                new_values.append(task.__dict__[atr])
-            event.fields_to_update = fields_to_update
-            event.old_values = old_values
-            event.new_values = new_values
-
-            event.save()
+            requests.post(end_point, task_msg)
 
             return redirect('task_list')
     else:
@@ -58,90 +54,42 @@ def task_create_new(request):
 
 
 def task_details(request, pk):
-    task = get_object_or_404(Task, pk=pk)
+    task = requests.get(ROOT_ENDPOINT + f'task/{pk}').json()
     return render(request, 'task_details.html', {'task': task})
 
 
 def task_edit(request, pk):
-    task = get_object_or_404(Task, pk=pk)
-    task_old = copy.copy(task)
+    task_json = requests.get(ROOT_ENDPOINT + f'task/{pk}').json()
     if request.method == "POST":
-        task_edit_form = TaskForm(request.POST, instance=task)
+        task_edit_form = TaskForm(request.POST)
 
         if task_edit_form.is_valid():
+            end_point = ROOT_ENDPOINT + 'task/{}/'.format(task_json['id'])
+            task_msg = task_edit_form.cleaned_data
             current_user = request.user.username if request.user.username != '' else 'Anonymous'
+            task_msg['author'] = current_user
 
-            task = task_edit_form.save(commit=False)
-            task.save()
+            requests.put(end_point, task_msg)
 
-            event = HistoricalTaskEvent.objects.create(task=task, historical_task_id=task.id, task_name=task.name,
-                                                       user_who_edited=current_user)
-            event.action = 'Update'
-            assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
-            event.assigned_user = assigned_user
-
-            fields_where_change_occurred = set([atr for atr, value in
-                                                task_old.__dict__.items() ^ task.__dict__.items()
-                                                if atr not in forbidden_list])
-            fields_to_update, old_values, new_values = [], [], []
-            if map_value in fields_where_change_occurred:
-                fields_where_change_occurred.remove(map_value)
-                fields_to_update.append('assigned user')
-                old_values.append(task_old.assigned_user.username if task_old.assigned_user != None else '---')
-                new_values.append(assigned_user)
-
-            for atr in fields_where_change_occurred:
-                fields_to_update.append(atr)
-                old_values.append(task_old.__dict__[atr])
-                new_values.append(task.__dict__[atr])
-            event.fields_to_update = fields_to_update
-            event.old_values = old_values
-            event.new_values = new_values
-
-            event.save()
-
-            return redirect('task_details', pk=task.pk)
+            return redirect('task_details', pk=task_json['id'])
     else:
-        task_edit_form = TaskForm(instance=task)
+        task_edit_form = TaskForm()
+        for key in task_json:
+            if key in task_edit_form.fields:
+                task_edit_form.fields[key].initial = task_json[key]
 
     return render(request, 'task_edit.html', {'form': task_edit_form})
 
 
 def task_delete(request, pk):
-    task = get_object_or_404(Task, pk=pk)
-
-    current_user = request.user.username if request.user.username != '' else 'Anonymous'
-    event = HistoricalTaskEvent.objects.create(task=task, historical_task_id=task.id, task_name=task.name,
-                                               user_who_edited=current_user)
-    event.action = 'Delete'
-    assigned_user = task.assigned_user.username if task.assigned_user != None else '---'
-    event.assigned_user = assigned_user
-
-    fields = set([atr for atr, value in task.__dict__.items() if atr not in forbidden_list])
-    fields_to_update, old_values, new_values = [], [], []
-    if map_value in fields:
-        fields.remove(map_value)
-        fields_to_update.append('assigned user')
-        old_values.append(assigned_user)
-        new_values.append('---')
-
-    for atr in fields:
-        fields_to_update.append(atr)
-        old_values.append(task.__dict__[atr])
-        new_values.append('---')
-    event.fields_to_update = fields_to_update
-    event.old_values = old_values
-    event.new_values = new_values
-
-    event.save()
-    task.delete()
-
+    requests.delete(ROOT_ENDPOINT + f'task/{pk}')
     return redirect('task_list')
 
 
 def task_history(request):
     task_events_filter = HistoricalTaskEventFilter(request.POST,
-                                            queryset=HistoricalTaskEvent.objects.all().order_by('-occurrence_date'))
+                                                   queryset=HistoricalTaskEvent.objects.all().order_by(
+                                                       '-occurrence_date'))
     display_detailed_history_url_button = False
     the_one_task = None
     timezone_from_datetimefield = None

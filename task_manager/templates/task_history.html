@@ -11,7 +11,7 @@
                 <button class="btn btn-primary" type="submit">Apply filter</button>
             </form>
         {% if display_detailed_url == True %}
-            <a href="{% url 'task_history_details' pk=task.pk time=state_date %}">
+            <a href="{% url 'task_history_details' pk=task.id time=state_date %}">
                 <button class="btn btn-info">Show task state at given time</button>
             </a>
         {% endif %}

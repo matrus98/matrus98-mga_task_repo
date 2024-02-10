@@ -20,9 +20,9 @@
                             <td>{{ task.assigned_user }}</td>
                             <td>{{ task.status }}</td>
                             <td>
-                                <a href="{% url 'task_details' pk=task.pk %}"><button class="btn btn-info">Details</button></a>
-                                <a href="{% url 'task_edit' pk=task.pk %}"><button class="btn btn-info">Edit</button></a>
-                                <a href="{% url 'task_delete' pk=task.pk %}"><button class="btn btn-info">Delete</button></a>
+                                <a href="{% url 'task_details' pk=task.id %}"><button class="btn btn-info">Details</button></a>
+                                <a href="{% url 'task_edit' pk=task.id %}"><button class="btn btn-info">Edit</button></a>
+                                <a href="{% url 'task_delete' pk=task.id %}"><button class="btn btn-info">Delete</button></a>
                             </td>
                         </tr>
                     {% endfor %}

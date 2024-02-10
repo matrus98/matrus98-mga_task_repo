@@ -16,7 +16,7 @@ class Task(models.Model):
     author = models.CharField(max_length=100, default='Administrator')
     name = models.CharField(max_length=100)
     description = models.TextField()
-    status = models.CharField(choices=TaskStatusChoices, default='CREATED')
+    status = models.CharField(choices=TaskStatusChoices, default='Nowy')
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
@@ -38,11 +38,3 @@ class HistoricalTaskEvent(models.Model):
 
     def __str__(self):
         return f"Task {self.task_name} has been modified at: {self.occurrence_date}"
-
-
-TaskFieldToBeFiltered = {
-    'none': 'Do not filter',
-    'name_description': 'Task name and description',
-    'status': 'Task Status',
-    'assigned_user': 'Assigned user',
-}
