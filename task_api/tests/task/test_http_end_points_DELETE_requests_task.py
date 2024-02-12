@@ -3,9 +3,6 @@ import requests
 
 from rest_framework import status
 
-@pytest.fixture(scope='function')
-def all_tasks():
-    return requests.get('http://localhost:8000/api/task/').json()
 
 def test_delete_first_task(all_tasks):
     try:
