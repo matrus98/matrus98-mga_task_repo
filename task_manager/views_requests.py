@@ -12,7 +12,7 @@ from os.path import join
 forbidden_list = ['_state', '_django_version', 'id']
 map_value = 'assigned_user_id'
 ROOT_ENDPOINT = 'http://localhost:{}/api/' \
-                    .format(envs['MY_WEB_APP_EXTERNAL_PORT'] if 'is_docker_running_env_variable' in envs else '8000')
+                    .format(envs['MY_WEB_APP_INTERNAL_PORT_IN_CONTAINER'] if 'is_docker_running_env_variable' in envs else '8000')
 
 
 def _create_event(response, old_values, current_user, assigned_user_name, action_type):
