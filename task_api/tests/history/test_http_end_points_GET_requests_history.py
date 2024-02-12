@@ -5,7 +5,7 @@ import datetime
 from rest_framework import status
 
 def test_get_entire_history():
-    url = 'http://localhost:8000/api/history'
+    url = 'http://localhost:8000/api/history/'
     response = requests.get(url)
     assert response.status_code == status.HTTP_200_OK
 
