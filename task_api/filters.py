@@ -30,4 +30,4 @@ class HistoricalTaskEventFilter(django_filters.FilterSet):
 
     class Meta:
         model = HistoricalTaskEvent
-        fields = ['task']
+        fields = ['historical_task_id']
