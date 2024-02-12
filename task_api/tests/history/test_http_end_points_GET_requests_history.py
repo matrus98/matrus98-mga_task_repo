@@ -11,7 +11,7 @@ def test_get_entire_history():
 
 
 def test_rebuild_task_from_events(all_tasks):
-    url = 'http://localhost:8000/api/history/?task={}&occurrence_date={}'.format(
+    url = 'http://localhost:8000/api/history/?historical_task_id={}&occurrence_date={}'.format(
         all_tasks[0]['id'],
         "{}T21:37:33.082339Z".format(datetime.date.today())
     )
