@@ -1,3 +1,5 @@
+[![Docker Image CI](https://github.com/matrus98/matrus98-mga_task_repo/actions/workflows/docker-image.yml/badge.svg)](https://github.com/matrus98/matrus98-mga_task_repo/actions/workflows/docker-image.yml)
+
 # This project shows skills of usage the following technologies:
 <ul>
     <li>Python</li>
