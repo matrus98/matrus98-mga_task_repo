@@ -15,7 +15,9 @@ jobs:
       run: |
         docker-compose -f "docker-compose.yml" up -d --build
         services=$(docker-compose config --services)
-        echo $services
+        echo #########
+        docker images --format "{{.Repository}}" | head -n 1
+        echo #########
         for service in $services; do
           docker save -o "${service}.tar" "${service}"
         done
