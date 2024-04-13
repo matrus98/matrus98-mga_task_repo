@@ -15,6 +15,8 @@ jobs:
       run: docker-compose -f "docker-compose.yml" up -d --build
     - name: Save docker stack
       run: |
+        services=$(docker-compose config --services)
+        echo $services
         app_name = `docker images --format "{{.Repository}}" | head -n 1`
         docker save -o "${app_name}.tar" "${app_name}"
     - name: Stop stack
