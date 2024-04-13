@@ -20,4 +20,4 @@ jobs:
       run: docker-compose -f "docker-compose.yml" down
     - name: Move Docker image tar files to repository directory
       run: |
-        mv *.tar /artifacts/
+        mv *.tar /artifacts
