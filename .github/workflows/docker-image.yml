@@ -15,10 +15,7 @@ jobs:
       run: docker-compose -f "docker-compose.yml" up -d --build
     - name: Save Docker images as tar files
       run: |
-        services=$(docker-compose config --services)
-        for service in $services; do
-          docker image save -o "${service}.tar" "${service}"
-        done
+        docker image save -o "my_web_app.tar" "my_web_app"
     - name: Move Docker image tar files to repository directory
       run: |
         mkdir -p /artifacts
