@@ -17,7 +17,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: task_manager
-        path: ./artifacts
+        path: .
     - name: Stop stack
       if: always()
       run: docker-compose -f "docker-compose.yml" down
