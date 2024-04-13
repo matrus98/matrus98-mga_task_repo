@@ -12,18 +12,17 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker stack
-      run: docker-compose -f "docker-compose.yml" up -d --build
-    - name: Save Docker images as tar files
       run: |
+        docker-compose -f "docker-compose.yml" up -d --build
         services=$(docker-compose config --services)
         echo $services
         for service in $services; do
           docker save -o "${service}.tar" "${service}"
         done
+    - name: Stop stack
+      if: always()
+      run: docker-compose -f "docker-compose.yml" down
     - name: Move Docker image tar files to repository directory
       run: |
         mkdir -p /artifacts
         mv *.tar /artifacts
-    - name: Stop stack
-      if: always()
-      run: docker-compose -f "docker-compose.yml" down
