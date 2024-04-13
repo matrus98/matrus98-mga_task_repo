@@ -1,0 +1,22 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- main
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+jobs:
+  - job: BuildDockerStack
+    displayName: Building docker stack
+    steps:
+    - task: DockerCompose@0
+      inputs:
+        containerregistrytype: 'Azure Container Registry'
+        dockerComposeFile: 'docker-compose.yml'
+        action: 'Run a Docker Compose command'
