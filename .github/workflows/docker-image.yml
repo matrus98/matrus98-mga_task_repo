@@ -16,7 +16,7 @@ jobs:
     - name: Save Docker images as tar files
       run: |
         services=$(docker-compose config --services)
-        echo services
+        echo $services
         for service in $services; do
           docker image save -o "${service}.tar" "${service}"
         done
