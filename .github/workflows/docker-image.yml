@@ -13,17 +13,16 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build the Docker stack
       run: docker-compose -f "docker-compose.yml" up -d --build
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: task_manager
-        path: |
-          mga_task/
-          task_api/
-          task_manager/
-          gunicorn.conf
-          manage.py
-          requirements.txt
+    - name: Save Docker images as tar files
+      run: |
+        services=$(docker-compose config --services)
+        for service in $services; do
+          docker image save -o "${service}.tar" "${service}"
+        done
+    - name: Move Docker image tar files to repository directory
+      run: |
+        mkdir -p /artifacts
+        mv *.tar /artifacts
     - name: Stop stack
       if: always()
       run: docker-compose -f "docker-compose.yml" down
