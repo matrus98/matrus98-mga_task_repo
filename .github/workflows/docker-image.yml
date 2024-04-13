@@ -18,7 +18,6 @@ jobs:
       run: docker-compose -f "docker-compose.yml" down
     - name: Save docker stack
       run: |
-        services=$(docker-compose config --services)
         app_name = docker images --format "{{.Repository}}" | head -n 1
         docker save -o "${app_name}.tar" "${app_name}"
     - name: Move Docker image tar files to repository directory
