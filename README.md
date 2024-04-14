@@ -9,6 +9,7 @@
     <li>Gunicorn</li>
     <li>Postgresql</li>
     <li>Docker</li>
+    <li>Terraform</li>
 </ul>
 LinkedIn of author: https://www.linkedin.com/in/mateusz-ruszkowski/
 

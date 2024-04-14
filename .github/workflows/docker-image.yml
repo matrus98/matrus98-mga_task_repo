@@ -11,10 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build the docker stack
-      run: docker-compose -f "docker-compose.yml" up -d --build
-    - name: Save the docker stack
-      run: docker save -o "matrus98-mga_task_repo_my_web_app.tar" "matrus98-mga_task_repo_my_web_app"
+    - name: Build and save docker images
+      run: |
+        terraform init
+        terraform apply
+    # - name: Build the docker stack
+    #   run: docker-compose -f "docker-compose.yml" up -d --build
+    # - name: Save the docker stack
+    #   run: docker save -o "matrus98-mga_task_repo_my_web_app.tar" "matrus98-mga_task_repo_my_web_app"
     - name: Stop stack
       if: always()
       run: docker-compose -f "docker-compose.yml" down
@@ -22,4 +26,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: task_manager
-        path: matrus98-mga_task_repo_my_web_app.tar
+        path: |
+          task_manager.tar
+          db_my_web_app_docker_image.tar
