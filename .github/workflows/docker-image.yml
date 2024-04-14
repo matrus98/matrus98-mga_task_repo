@@ -14,7 +14,8 @@ jobs:
     - name: Build the docker stack
       run: docker-compose -f "docker-compose.yml" up -d --build
     - name: Save the docker stack
-      run: docker save -o "matrus98-mga_task_repo_my_web_app.tar" "matrus98-mga_task_repo_my_web_app"
+      run: docker save -o "db.tar" "db"
+     # run: docker save -o "matrus98-mga_task_repo_my_web_app.tar" "matrus98-mga_task_repo_my_web_app"
     - name: Stop stack
       if: always()
       run: docker-compose -f "docker-compose.yml" down
