@@ -15,6 +15,7 @@ services:
   my_web_app:
     depends_on:
       - db
+    image: task_manager
     container_name: ${TASK_MANAGER_CONTAINER_NAME}
     build:
       context: ./

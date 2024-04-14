@@ -12,3 +12,4 @@ notatki.txt
 task_manager/migrations
 **.pytest_cache
 **__pycache__
+**.tar
